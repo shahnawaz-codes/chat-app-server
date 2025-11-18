@@ -1,4 +1,5 @@
 import cloudinary from "../lib/cloudinary.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
 import { authModel } from "../model/authModel.js";
 import { Message } from "../model/messageModel.js";
 
@@ -23,8 +24,7 @@ export const getMessageById = async (req, res) => {
     const message = await Message.find({
       $or: [
         { senderId: myId, receiverId: otherId },
-        { receiverId: myId },
-        { senderId: otherId },
+        { receiverId: myId, senderId: otherId },
       ],
     })
       .select("-__v -password")
@@ -52,6 +52,10 @@ export const sendMessage = async (req, res) => {
       senderId,
       receiverId,
     }).save();
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
     res.status(201).json(newMessage);
   } catch (error) {
     console.log("somthing went error in sending msg ", error);
