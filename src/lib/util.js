@@ -5,8 +5,9 @@ export const genToken = (userId, res) => {
   });
   res.cookie("token", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
+    secure: true, // must be true for HTTPS
+    sameSite: "none", // must be "none" for cross-domain
     httpOnly: true,
-    sameSite: "strict",  
   });
   return token;
 };
