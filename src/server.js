@@ -20,9 +20,9 @@ app.use(cookieParser());
 app.use(express.json({ limit: "10mb", extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
-  })
+  }),
 );
 app.get("/api/auth", (req, res) => {
   res.send("Auth API");
@@ -32,6 +32,6 @@ app.use("/api/auth", authRoute);
 app.use("/api/message", messageRoute);
 
 server.listen(process.env.PORT, () => {
-  console.log(`Server is running on http://localhost:${process.env.PORT}`);
+  console.log(`Server is running on http://host:${process.env.PORT}`);
   connectDB();
 });
