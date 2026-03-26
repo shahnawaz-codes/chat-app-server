@@ -20,8 +20,7 @@ export const signup = async (req, res) => {
     } else if (password.length < 6) {
       return res.json({ msg: "password must be at least 5 digits" });
     }
-    const saltRounds = await bcrypt.genSalt(8);
-    const hashPass = await bcrypt.hash(password, saltRounds);
+    const hashPass = await bcrypt.hash(password, 10);
     //add the data in db
     const NewUser = await new authModel({
       fullName,
@@ -64,7 +63,9 @@ export const login = async (req, res) => {
     //success
     if (user) {
       genToken(user._id, res);
-      res.status(200).json({ success: true, msg: "successfully login", user });
+      return res
+        .status(200)
+        .json({ success: true, msg: "successfully login", user });
     }
   } catch (error) {
     res.status(500).json({ msg: "server internal error" });
@@ -80,7 +81,7 @@ export const logout = (req, res) => {
 
 export const updateProfilePic = async (req, res) => {
   try {
-    const { profilePic } = req.body; //this image is object i mean in object format not an url / or we can also pass the base64 string
+    const { profilePic } = req.body; //this image is object format not an url / or we can also pass the base64 string
     const id = req.user._id;
     if (!profilePic) {
       return res.status(400).json({ msg: "image is required" });
@@ -93,7 +94,7 @@ export const updateProfilePic = async (req, res) => {
       {
         profilePic: updatePic.secure_url,
       },
-      { new: true }
+      { new: true },
     );
     res.status(200).json({ success: true, user: pic });
   } catch (error) {
